@@ -7,6 +7,7 @@ const Requestlogger = require('./middlewares/logger.js');
 const errorhandler = require('./middlewares/errorHandler.js');
 
 const articleRoutes = require("./routes/article.route.js");
+const userRoutes = require("./routes/user.route.js");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -20,6 +21,7 @@ app.use(cors('*'));
 app.use(Requestlogger);
 
 app.use("/api", articleRoutes);
+app.use("/api/users", userRoutes);
 
 app.use(errorhandler);
 

@@ -3,20 +3,12 @@ const Joi = require("joi");
 const ArticleModel = require("../models/article.model.js");
 
 const postArticle = async (req, res, next) => {
-    const schema = Joi.object({
-        title: Joi.string().min(5).required(),
-        content: Joi.string().min(20).required(),
-        author: Joi.string().optional().default("Guest"),
-    });
-
-    const { error , value } = schema.validate(req.body);
-
-    if (error) {
-        return res.status(400).json("Please provide valid article data and content");
-    }
-
 try {
-    const newArticle = new ArticleModel(value);
+    const newArticle = new ArticleModel({
+        title: req.body.title,
+        content: req.body.content,
+        author: req.user._id
+    });
     await newArticle.save();
 
     res.status(200).json({
@@ -31,15 +23,9 @@ try {
 };
 
 const getAllArticle = async (req, res, next) => {
-    const { limit = 10, page = 1 } = req.query;
-
-    const skip = (page - 1) * limit;
-
 try {
+    console.log(req.user);
     const articles = await ArticleModel.find()
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
 
     res.status(200).json({
         message: "Articles retrieved successfully",
