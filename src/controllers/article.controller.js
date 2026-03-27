@@ -107,10 +107,4 @@ const deleteArticleByid = async (req, res, next) => {
     }
 };
 
-module.exports = {
-    postArticle,
-    getAllArticle,
-    getArticleById,
-    updateArticleByid,
-    deleteArticleByid
-};
+module.exports = {getAllArticle, postArticle, getArticleById, updateArticleByid, deleteArticleByid};

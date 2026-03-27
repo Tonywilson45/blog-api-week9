@@ -1,4 +1,4 @@
-const { JsonWebTokenError } = require('jsonwebtoken');
+const { jsonWebTokenError } = require('jsonwebtoken');
 const UserModel = require('../models/user.model');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
