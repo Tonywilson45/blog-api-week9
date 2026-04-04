@@ -85,4 +85,96 @@ try {
         }
     };
 
-module.exports = { registerUser, loginUser };
+    // get all users
+const getAllUsers = async (req, res, next) => {
+    try {
+        const users = await UserModel.find().select("-password");
+
+        res.status(200).json({
+            message: "Users fetched successfully",
+            count: users.length,
+            data: users
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// get single user
+const getSingleUser = async (req, res, next) => {
+    try {
+        const user = await UserModel.findById(req.params.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+            message: "User fetched successfully",
+            data: user
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// update user
+const updateUser = async (req, res, next) => {
+
+    const updateSchema = Joi.object({
+        username: Joi.string().min(3),
+        email: Joi.string().email(),
+        password: Joi.string().min(6)
+    });
+
+    const { error } = updateSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+
+    try {
+        const updates = { ...req.body };
+
+        // hash password if updating
+        if (updates.password) {
+            const salt = await bcrypt.genSalt(12);
+            updates.password = await bcrypt.hash(updates.password, salt);
+        }
+
+        const user = await UserModel.findByIdAndUpdate(
+            req.params.id,
+            updates,
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+            message: "User updated successfully",
+            data: user
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// delete user
+const deleteUser = async (req, res, next) => {
+    try {
+        const user = await UserModel.findByIdAndDelete(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+            message: "User deleted successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { registerUser, loginUser, getAllUsers, getSingleUser, updateUser, deleteUser };
