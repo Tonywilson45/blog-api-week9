@@ -1,10 +1,16 @@
 const dotenv = require("dotenv");
 const express = require("express");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./src/config/swagger.js");
 
 dotenv.config();
-console.log("MONGO_URI:", process.env.MONGO_URI); // Debugging line to check if MONGO_URI is loaded
-console.log("JWT_SECRET:", process.env.JWT_SECRET); // Debugging line to check if JWT_SECRET is loaded
 
+const app = express();
+
+console.log("MONGO_URI:", process.env.MONGO_URI);
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const checkEnv = require("./src/config/.envCheck.js");
 checkEnv();
@@ -18,7 +24,6 @@ const articleRoutes = require("./src/routes/articleRoutes.js");
 const userRoutes = require("./src/routes/userRoutes.js");
 const uploadRoutes = require("./src/routes/uploadRoutes");
 
-const app = express();
 const PORT = process.env.PORT || 4000;
 
 connectDB();
@@ -27,12 +32,10 @@ app.use(express.json());
 app.use(cors());
 app.use(Requestlogger);
 
-app.use("/api/upload", uploadRoutes);
-
 // routes
+app.use("/api/upload", uploadRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/upload", uploadRoutes);
 
 // serve images
 app.use("/uploads", express.static("uploads"));
